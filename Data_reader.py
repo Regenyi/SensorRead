@@ -3,7 +3,7 @@ import datetime
 
 filename = 'test01.csv'
 with open(filename) as ds:
-    reader = csv.reader(ds)
+    reader = csv.reader(ds)  # , delimiter='\t')
     data = [r for r in reader]
     # data = []
     # for r in row:
