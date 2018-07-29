@@ -1,7 +1,15 @@
 import csv
+import numpy as np
+import random
 
 file = "data/save-1.tsv"
+dat = []
+filter3 = []
 
+def nonlin(x, deriv=False):
+    if (deriv == True):
+        return x * (1 - x)
+    return 1 / (1 + np.exp(-x))
 
 def reader():
     with open(file) as dat:
@@ -13,9 +21,6 @@ def reader():
 
     for row in data:
         print(row)
-
-
-dat = []
 
 
 def readLines():
@@ -34,11 +39,37 @@ def readLines():
                 dat.append(y)
 
 
+def training_start():
+    np.random.seed(1)
+    array1 = [random.uniform(-1, 1) for _ in range(10)]
+    array2 = [random.uniform(-1, 1) for _ in range(10)]
+    array3 = [random.uniform(-1, 1) for _ in range(10)]
+    array4 = [random.uniform(-1, 1) for _ in range(10)]
+    filter = []
+    filter.append(array1)
+    filter.append(array2)
+    filter2 = []
+    filter2.append(array3)
+    filter2.append(array4)
+    filter3.append(filter)
+    filter3.append(filter2)
+
+
+def get_matrix():
+    for iter in xrange(1):
+        # forward propagation
+        l0 = filter3
+        l1 = nonlin(np.dot(l0, ))
+
+
 readLines()
+training_start()
+get_matrix()
 
-for row in dat:
-    print(row)
+# for row in dat:
+#     print(row)
 
-#
+
+
 
 
