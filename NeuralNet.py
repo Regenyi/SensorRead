@@ -2,22 +2,9 @@ import csv
 import numpy as np
 import random
 
-x = 0
 file = "data/save-1.tsv"
-dat = []
+sensor_data = []
 result = []
-weight_random = np.array([random.uniform(-1, 1) for _ in range(10)], np.float)
-array2 = np.array([random.uniform(-1, 1) for _ in range(10)], np.float)
-layer1_con_weights = [[1.0, 2.0],
-                      [3.0,  4.0],
-                      [5.0,  6.0],
-                      [7.0,  8.0],
-                      [9.0, 10.0],
-                      [11.0, 12.0],
-                      [13.0, 14.0],
-                      [15.0, 16.0],
-                      [17.0, 18.0],
-                      [19.0, 20.0]]
 
 
 def nonlin(x, deriv=False):
@@ -30,65 +17,53 @@ def read_lines():
     with open(file) as data:
         reader = csv.reader(data, delimiter=' ')
         for row in reader:
-            temp = []
+            temp_row_line = []
             for cell in row:
-                y = float(cell)
-                temp.append(y)
-            dat.append(temp)
+                float_cell = float(cell)
+                temp_row_line.append(float_cell)
+            sensor_data.append(temp_row_line)
 
 
 def array_randomizer():
     return np.array([random.uniform(-1, 1) for _ in range(10)], np.float)
 
 
-def training_start():
-    array1 = np.array([random.uniform(-1, 1) for _ in range(10)])
-    array2 = np.array([random.uniform(-1, 1) for _ in range(10)])
-    array3 = np.array([random.uniform(-1, 1) for _ in range(10)])
-    array4 = np.array([random.uniform(-1, 1) for _ in range(10)])
+def run_neuron_net(line, nn):
+    # forward propagation
 
-
-def get_matrix(line, rnd1, rnd2):
-    for iter in range(1):
-        # forward propagation
-        l0 = dat[line]
-        # print("2x1" , np.dot(np.matrix([[2], [5], [1]]), np.matrix([[3, 2]])))
-        # l1 = np.dot(np.matrix([[1], [5]]), np.matrix(array1))
-        # l1 = np.dot(np.matrix([[1, 5]]), np.matrix([weight_random, array2]))  # 10x2,  2x1
-        # l1 = nonlin(np.dot(np.matrix(layer1_con_weights), np.matrix([l0])))  # 2x10,  1x2
-
-        l1 = nonlin(np.dot(np.matrix(layer1_con_weights), np.matrix([[l0[0]], [l0[1]]])))  # 2x10,  1x2
-        output = nonlin(np.dot(np.matrix([rnd1, rnd2]), np.matrix(l1)))
-
-        # l1 = nonlin(np.dot(l0, array1))
-
+    input = sensor_data[line]
+    layer1 = nonlin(np.dot(np.matrix(nn[2]), np.matrix([[input[0]], [input[1]]])))  # 2x10,  1x2
+    output = nonlin(np.dot(np.matrix([nn[0], nn[1]]), np.matrix(layer1)))
     result.append(output)
 
 
 def print_res():
-    for row in dat:
-        print(row)
+    for row in range(len(sensor_data)):
+        print(sensor_data[row], result[row])
 
 
-def print_res2():
-    for row in range(len(dat)):
-        print(dat[row], result[row])
-
-
-def loop(x):
+def create_random_nums():
     rnd1 = array_randomizer()
     rnd2 = array_randomizer()
-    while x != len(dat):
-        line = 0
-        # training_start()
-        get_matrix(line, rnd1, rnd2)
+    random_number = random.uniform(-1, 1)
+    layer1_con_weights = [[random_number for i in range(2)] for j in range(10)]
+    nn = [rnd1, rnd2, layer1_con_weights]
+    return nn
+
+
+def loop():
+    nn = create_random_nums()
+    x = 0
+    line = 0
+    while x != len(sensor_data):
+        run_neuron_net(line, nn)
         line += 1
         x += 1
 
 
 read_lines()
-loop(x)
-print_res2()
+loop()
+print_res()
 
 
 
