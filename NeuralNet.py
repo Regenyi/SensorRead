@@ -57,6 +57,7 @@ def loop():
     line = 0
     while x != len(sensor_data):
         run_neuron_net(line, nn)
+        # nn3 = breed(nn1, nn2)
         line += 1
         x += 1
 
