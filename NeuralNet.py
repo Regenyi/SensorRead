@@ -1,3 +1,5 @@
+# thanks to @iamtrask and the stackoverflow community
+
 import csv
 import numpy as np
 import random
@@ -39,7 +41,8 @@ def run_neuron_net(line, nn):
 
 def print_res():
     for row in range(len(sensor_data)):
-        print(sensor_data[row], result[row])
+        x = str(result[row])
+        print("input neurons: ", sensor_data[row], '{1: >5} output: {0: >5}'.format(x.replace("\n", ''), " "))
 
 
 def create_random_nums():
