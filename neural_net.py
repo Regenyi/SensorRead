@@ -35,14 +35,16 @@ def create_random_nums():
 
 
 def breed(neuralnet1, neuralnet2):
-    breed_list = []
-    for i in range(len(neuralnet1)):
-        breed0 = random_choose(neuralnet1[i][0], neuralnet2[i][0])
-        breed1 = random_choose(neuralnet1[i][1], neuralnet2[i][1])
-        breed_list.append(breed0)
-        breed_list.append(breed1)
-        breed_list.append("\n")
-    # print(breed_list)
+    breed_list = neuralnet1
+    x0 = neuralnet1
+    x1 = neuralnet2
+    print("nn1", x0)
+    print("nn2", x1)
+    for i in range(len(x0)):
+        for j in range(len(x0[i])):
+            for k in range(len(x0[i][j])):
+                breed_list[i][j][k] = random_choose(x0[i][j][k], x1[i][j][k])
+    print("res", breed_list)
     return breed_list
 
 
@@ -80,9 +82,23 @@ def print_res():
         print("input neurons: ", sensor_data[row], '{1: >5} output: {0: >5}'.format(x.replace("\n", ''), " "))
 
 
+def gen_test_3darrays():
+    global x0, x1, z, z2
+    x0 = np.zeros((3, 3, 3))
+    x1 = np.ones((3, 3, 3))
+    x = np.zeros((3, 2))
+    y = np.zeros((2, 3))
+    z = np.array([x, y])
+    x = np.ones((3, 2))
+    y = np.ones((2, 3))
+    z2 = np.array([x, y])
+
+
 read_lines()
 loop()
-breed(result, sensor_data)
+gen_test_3darrays()
+breed(x0, x1)
+breed(z, z2)
 # print_res()
 
 
