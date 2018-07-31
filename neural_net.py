@@ -3,11 +3,17 @@
 import csv
 import numpy as np
 import random
-# from numpy import random
+
 
 file = "data/save-1.tsv"
 sensor_data = []
-result = []
+
+
+def create_empty_res_lists(num):
+    global list_of_results
+    list_of_results = []
+    for j in range(num):
+        list_of_results.append([])
 
 
 def read_lines():
@@ -70,49 +76,63 @@ def nonlin(x, deriv=False):
     return 1 / (1 + np.exp(-x))
 
 
-def run_nn_on_line(line, nn):
+def run_nn_on_line(line, nn, iteration):
     # forward propagation:
     input = sensor_data[line]
     layer1 = nonlin(np.dot(np.matrix(nn[2]), np.matrix([[input[0]], [input[1]]])))  # 2x10, 1x2
     output = nonlin(np.dot(np.matrix([nn[0], nn[1]]), np.matrix(layer1)))
-    result.append(output)
+    list_of_results[iteration].append(output)
 
 
-def run_nn_on_input_data():
+def run_nn_on_input_data(iteration):
     nn = create_random_nums()
     x = 0
     line = 0
     while x != len(sensor_data):
-        run_nn_on_line(line, nn)
+        run_nn_on_line(line, nn, iteration)
         line += 1
         x += 1
 
 
 def run_population(num):
     for i in range(num):
-        run_nn_on_input_data()
+        run_nn_on_input_data(i)
 
 
-def print_res():  # input: page
+def print_res(index):  # input: page
+    print("\n********** result list index is:", index, "***********\n")
     for row in range(len(sensor_data)):
-        x = str(result[row])
+        x = str(list_of_results[index][row])
         print("input neurons: ", sensor_data[row], '{1: >5} output: {0: >5}'.format(x.replace("\n", ''), " "))
 
 
 read_lines()
+create_empty_res_lists(10)
 run_population(10)
-gen_test_3darrays()
-breed(x0, x1)
-breed(z, z2)
-print_res()
+# gen_test_3darrays()
+# breed(x0, x1)
+# breed(z, z2)
+print_res(2)
 
-# 10 db listába mentem
+
+# todo:
+# 10 db listába mentem --
 # a legmagasabb első oszlop száma alapján a 10 listából megtartom aki a legmagasabb volt.
 # és breedeltetem a képlet alapján
+# [ return (sorted^.to (!!0)._1)
+# , foo 0 1
+# , foo 0 2
+# , foo 0 3
+# , foo 0 4
+# , foo 2 3
+# , foo 2 4
+# , foo 0 9
+# , foo 8 9
+# , newRandomNet]
 # ez lesz a második generáció
 # exit condition vagy 0.99-1 vagy 100 generáció
 
-#
+
 
 
 
