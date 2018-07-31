@@ -34,17 +34,29 @@ def create_random_nums():
     return nn
 
 
+def gen_test_3darrays():
+    global x0, x1, z, z2
+    x0 = np.zeros((3, 3, 3))
+    x1 = np.ones((3, 3, 3))
+    x = np.zeros((3, 2))
+    y = np.zeros((2, 3))
+    z = np.array([x, y])
+    x = np.ones((3, 2))
+    y = np.ones((2, 3))
+    z2 = np.array([x, y])
+
+
 def breed(neuralnet1, neuralnet2):
     breed_list = neuralnet1
     x0 = neuralnet1
     x1 = neuralnet2
-    print("nn1", x0)
-    print("nn2", x1)
+    # print("nn1", x0)
+    # print("nn2", x1)
     for i in range(len(x0)):
         for j in range(len(x0[i])):
             for k in range(len(x0[i][j])):
                 breed_list[i][j][k] = random_choose(x0[i][j][k], x1[i][j][k])
-    print("res", breed_list)
+    # print("res", breed_list)
     return breed_list
 
 
@@ -58,7 +70,7 @@ def nonlin(x, deriv=False):
     return 1 / (1 + np.exp(-x))
 
 
-def run_neural_net(line, nn):
+def run_nn_on_line(line, nn):
     # forward propagation:
     input = sensor_data[line]
     layer1 = nonlin(np.dot(np.matrix(nn[2]), np.matrix([[input[0]], [input[1]]])))  # 2x10, 1x2
@@ -66,41 +78,41 @@ def run_neural_net(line, nn):
     result.append(output)
 
 
-def loop():
+def run_nn_on_input_data():
     nn = create_random_nums()
     x = 0
     line = 0
     while x != len(sensor_data):
-        run_neural_net(line, nn)
+        run_nn_on_line(line, nn)
         line += 1
         x += 1
 
 
-def print_res():
+def run_population(num):
+    for i in range(num):
+        run_nn_on_input_data()
+
+
+def print_res():  # input: page
     for row in range(len(sensor_data)):
         x = str(result[row])
         print("input neurons: ", sensor_data[row], '{1: >5} output: {0: >5}'.format(x.replace("\n", ''), " "))
 
 
-def gen_test_3darrays():
-    global x0, x1, z, z2
-    x0 = np.zeros((3, 3, 3))
-    x1 = np.ones((3, 3, 3))
-    x = np.zeros((3, 2))
-    y = np.zeros((2, 3))
-    z = np.array([x, y])
-    x = np.ones((3, 2))
-    y = np.ones((2, 3))
-    z2 = np.array([x, y])
-
-
 read_lines()
-loop()
+run_population(10)
 gen_test_3darrays()
 breed(x0, x1)
 breed(z, z2)
-# print_res()
+print_res()
 
+# 10 db listába mentem
+# a legmagasabb első oszlop száma alapján a 10 listából megtartom aki a legmagasabb volt.
+# és breedeltetem a képlet alapján
+# ez lesz a második generáció
+# exit condition vagy 0.99-1 vagy 100 generáció
+
+#
 
 
 
