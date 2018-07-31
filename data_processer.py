@@ -19,7 +19,6 @@ for row in data:
         filtered_data.append(row)
 
 
-
 for row in filtered_data:
     print(row[0], ':: '.join(row[2:5]))
 
