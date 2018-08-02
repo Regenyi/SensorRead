@@ -13,6 +13,8 @@ filtered_data = []
 for row in data:
     #  print(datetime.datetime.utcfromtimestamp(int(row[0])).strftime('%Y-%m-%d %H:%M:%S'))
     first_coord = row[2]
+    # threshold = 0,2 # where to cut
+    # repeated_line = 2 # how many consecutive line needs to be below threshold to cut it
     if first_coord[0:3] == "0,2" or first_coord[0:3] == "0,1" or first_coord[0:3] == "0,0":
         filtered_data.append("string")
     else:

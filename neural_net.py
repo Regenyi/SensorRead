@@ -53,17 +53,15 @@ def gen_test_3darrays():
 
 
 def breed(neuralnet1, neuralnet2):
-    breed_list = neuralnet1
-    x0 = neuralnet1
-    x1 = neuralnet2
-    # print("nn1", x0)
-    # print("nn2", x1)
-    for i in range(len(x0)):
-        for j in range(len(x0[i])):
-            for k in range(len(x0[i][j])):
-                breed_list[i][j][k] = random_choose(x0[i][j][k], x1[i][j][k])
-    # print("res", breed_list)
-    return breed_list
+    breeded = neuralnet1  # this is to create the proper dimensions for the new "empty" list
+    # print("nn1", neuralnet1)
+    # print("nn2", neuralnet2)
+    for i in range(len(neuralnet1)):
+        for j in range(len(neuralnet1[i])):
+            for k in range(len(neuralnet1[i][j])):
+                breeded[i][j][k] = random_choose(neuralnet1[i][j][k], neuralnet2[i][j][k])
+    # print("res", breeded)
+    return breeded
 
 
 def random_choose(num1, num2):
@@ -99,6 +97,40 @@ def run_population(num):
         run_nn_on_input_data(i)
 
 
+def sort_nn(nn):
+    nn_sorted = sorted(nn, key=lambda x: x[1], reverse=True)
+    return nn_sorted
+
+
+def rank_nns(list_of_nns):
+    nn_sorted_list = []
+    pieces = len(list_of_results)
+    for j in range(pieces):
+        nn_sorted_list.append([])
+    for i in range(pieces):
+        nn_sorted_list[i].append(sort_nn(list_of_nns[i]))
+    nn_rank = sorted(nn_sorted_list, key=lambda x: x[1][0], reverse=True)  # no such thing as x[1][0]
+    print(nn_rank)
+    return nn_rank
+
+
+def breeder(nn_ranked_list):
+    next_gen_nn = 10*[]
+    # , foo 0 1 :
+    next_gen_nn[0].append(breed(nn_ranked_list[0], nn_ranked_list[1]))
+    # , foo 0 2 :
+    next_gen_nn[1].append(breed(nn_ranked_list[0], nn_ranked_list[2]))
+
+    # , foo 0 3
+    # , foo 0 4
+    # , foo 2 3
+    # , foo 2 4
+    # , foo 0 9
+    # , foo 8 9+
+    # , newRandomNet
+    return next_gen_nn
+
+
 def print_res(index):  # input: page
     print("\n********** result list index is:", index, "***********\n")
     for row in range(len(sensor_data)):
@@ -106,37 +138,28 @@ def print_res(index):  # input: page
         print("input neurons: ", sensor_data[row], '{1: >5} output: {0: >5}'.format(x.replace("\n", ''), " "))
 
 
-read_lines()
-create_empty_res_lists(10)
-run_population(10)
-# gen_test_3darrays()
-# breed(x0, x1)
-# breed(z, z2)
-print_res(2)
+def tester():
+    # gen_test_3darrays()
+    # breed(x0, x1)
+    # breed(z, z2)
+    # print_res(2)
+    return 0
 
 
-# todo:
-# 10 db listába mentem --
-# a legmagasabb első oszlop száma alapján a 10 listából megtartom aki a legmagasabb volt.
-# és breedeltetem a képlet alapján
-# [ return (sorted^.to (!!0)._1)
-# , foo 0 1
-# , foo 0 2
-# , foo 0 3
-# , foo 0 4
-# , foo 2 3
-# , foo 2 4
-# , foo 0 9
-# , foo 8 9
-# , newRandomNet]
-# ez lesz a második generáció
-# exit condition vagy 0.99-1 vagy 100 generáció
+def main():
+    # *** INIT: *** #
+    read_lines()
+    create_empty_res_lists(10)
+    run_population(10)
+    rank_nns(list_of_results)
+    # breeder(rank_nns(list_of_results))
+
+    # *** NEXT GEN LOOP STARTS FROM HERE: *** #
+    # while exit_condition (0.99) not true or x = 100 loop run_nextgen_pop, sort, breed
 
 
-
-
-
-
+if __name__ == '__main__':
+    main()
 
 
 
