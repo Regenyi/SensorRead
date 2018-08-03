@@ -1,12 +1,13 @@
-# thanks to @iamtrask and the stackoverflow community
+''' thanks to @iamtrask and the stackoverflow community '''
 
 import csv
 import numpy as np
 import random
-import data_processer
+import data_processor
 
 file = "data/save-1.tsv"
 sensor_data = []
+np.random.seed(1)
 
 
 def read_lines():
@@ -37,7 +38,6 @@ def create_random_nn():
     random_number = random.uniform(-1, 1)
     layer1_connecting_weights = [[random_number for i in range(2)] for j in range(10)]
     nn = [weights1, weights2, layer1_connecting_weights]
-    # data_processer.save_to_file(nn[2], "layer1_first_run.csv")
     return nn
 
 
@@ -75,22 +75,20 @@ def nonlin(x, deriv=False):
     return 1 / (1 + np.exp(-x))
 
 
-def run_nn_on_line(line, nn, iteration):
+def run_nn_on_line(line, nn, iter):
     # forward propagation:
     input = sensor_data[line]
     layer1 = nonlin(np.dot((nn[2]), ([[input[0]], [input[1]]])))  # 2x10, 1x2
     output = nonlin(np.dot(([nn[0], nn[1]]), layer1))
-    list_of_results[iteration].append(output)
+    list_of_results[iter].append(output)
 
 
-def run_nn_on_input_data(iteration, nn):
+def run_nn_on_input_data(iter, nn):
     # nn = create_random_nums()
-    x = 0
     line = 0
-    while x != len(sensor_data):
-        run_nn_on_line(line, nn, iteration)
+    while line != len(sensor_data):
+        run_nn_on_line(line, nn, iter)
         line += 1
-        x += 1
 
 
 def run_population(num, nn=create_random_nn()):
@@ -185,7 +183,7 @@ def main():
     # *** NEXT GEN LOOP STARTS FROM HERE: *** #
     # while exit_condition (0.99) not true or x = 100 loop
 
-    nn = convert_to_nn(nextgen[0])  # valójában itt a 10 db-t kell majd beadni egyesével (run population)
+    nn = convert_to_nn(nextgen[0])  # todo: valójában itt a 10 db-t kell majd beadni egyesével (run population)
     create_empty_res_lists(10)
     run_population(10, nn)
     print("***********")
