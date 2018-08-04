@@ -17,7 +17,6 @@ def read_raw_data(delimeter):
                         float_cell = 0.0
                 temp_row_line.append(float_cell)
             sensor_data.append(temp_row_line)
-            # print(temp_row_line)
 
 
 def process_data():
@@ -25,31 +24,40 @@ def process_data():
     name = "new"
     i = 0
     repeated_line = 0
+    non_repeated_line = 0
     empty_line = [0.0, 0.0]
     for row in sensor_data:
+        if row == empty_line:
+            repeated_line += 1
+            # jump to next line
         if row != empty_line:
             filtered_data.append(row)
-
-        # if repeated_line > 10:
-        #     save_to_file(filtered_data, name+i)
-        #     i += 1
+            non_repeated_line += 1
+            repeated_line = 0
+        if non_repeated_line > 70 and repeated_line >= 5:
+            save_to_file(filtered_data, name+str(i))
+            filtered_data = []
+            i += 1
+            non_repeated_line = 0
+            repeated_line = 0
 
 
 def save_to_file(data, filename):
     with open(filename, 'w') as csvout:
         csvout = csv.writer(csvout)
         for row in data:
-            csvout.writerows(row)
+            csvout.writerow(row)
 
 
 def print_data(data):
     for row in data:
-        print(row[0], ':: '.join(row[2:5]))
+        print(row)
 
 
 def main():
     read_raw_data('\t')
     process_data()
+    # print_data(sensor_data)
 
 
 if __name__ == '__main__':
