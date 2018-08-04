@@ -4,10 +4,6 @@ import numpy as np
 import random
 import data_processor
 
-file = "data/save-1.tsv"
-processed_sensor_data = []
-np.random.seed(1)
-
 
 def create_empty_res_lists(num):
     global list_of_results
@@ -164,6 +160,8 @@ def tester():
 def main():
     # *** INIT: *** #
     global processed_sensor_data
+    np.random.seed(1)
+    file = "data/save-1.tsv"
     processed_sensor_data = data_processor.read_lines(file, ' ')
     create_empty_res_lists(10)
     run_population(10)

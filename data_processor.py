@@ -1,10 +1,8 @@
 import csv
 
-preprocessed_sensor_data = []
-file = 'data/kor.tsv'
 
-
-def read_raw_data(delim):
+def read_raw_data(file, delim):
+    preprocessed_sensor_data = []
     with open(file) as data:
         reader = csv.reader(data, delimiter=delim)
         for row in reader:
@@ -17,9 +15,10 @@ def read_raw_data(delim):
                         float_cell = 0.0
                 temp_row_line.append(float_cell)
             preprocessed_sensor_data.append(temp_row_line)
+    return preprocessed_sensor_data
 
 
-def process_data():
+def process_data(preprocessed_sensor_data):
     filtered_data = []
     name = "kor"
     i = 1
@@ -67,8 +66,9 @@ def read_lines(file, delim):
 
 
 def main():
-    read_raw_data('\t')
-    process_data()
+    file = 'data/kor.tsv'
+    raw_data = read_raw_data(file, '\t')
+    process_data(raw_data)
 
 
 if __name__ == '__main__':
