@@ -1,12 +1,12 @@
 import csv
 
-sensor_data = []
-file = 'data/haromszog.tsv'
+preprocessed_sensor_data = []
+file = 'data/kor.tsv'
 
 
-def read_raw_data(delimeter):
+def read_raw_data(delim):
     with open(file) as data:
-        reader = csv.reader(data, delimiter=delimeter)
+        reader = csv.reader(data, delimiter=delim)
         for row in reader:
             temp_string_cells = row[2:4]
             temp_row_line = []
@@ -16,26 +16,25 @@ def read_raw_data(delimeter):
                     if float_cell < 0.3:
                         float_cell = 0.0
                 temp_row_line.append(float_cell)
-            sensor_data.append(temp_row_line)
+            preprocessed_sensor_data.append(temp_row_line)
 
 
 def process_data():
     filtered_data = []
-    name = "new"
-    i = 0
+    name = "kor"
+    i = 1
     repeated_line = 0
     non_repeated_line = 0
     empty_line = [0.0, 0.0]
-    for row in sensor_data:
+    for row in preprocessed_sensor_data:
         if row == empty_line:
             repeated_line += 1
-            # jump to next line
         if row != empty_line:
             filtered_data.append(row)
             non_repeated_line += 1
             repeated_line = 0
         if non_repeated_line > 70 and repeated_line >= 5:
-            save_to_file(filtered_data, name+str(i))
+            save_to_file(filtered_data, name+('{0:0=2d}.{1}'.format(i, 'csv')))
             filtered_data = []
             i += 1
             non_repeated_line = 0
@@ -54,10 +53,22 @@ def print_data(data):
         print(row)
 
 
+def read_lines(file, delim):
+    processed_sensor_data = list()
+    with open(file) as data:
+        reader = csv.reader(data, delimiter=delim)
+        for row in reader:
+            temp_row_line = []
+            for cell in row:
+                float_cell = float(cell)
+                temp_row_line.append(float_cell)
+            processed_sensor_data.append(temp_row_line)
+        return processed_sensor_data
+
+
 def main():
     read_raw_data('\t')
     process_data()
-    # print_data(sensor_data)
 
 
 if __name__ == '__main__':

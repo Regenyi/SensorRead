@@ -1,24 +1,12 @@
 ''' thanks to @iamtrask and the stackoverflow community '''
 
-import csv
 import numpy as np
 import random
 import data_processor
 
 file = "data/save-1.tsv"
-sensor_data = []
+processed_sensor_data = []
 np.random.seed(1)
-
-
-def read_lines():
-    with open(file) as data:
-        reader = csv.reader(data, delimiter=' ')
-        for row in reader:
-            temp_row_line = []
-            for cell in row:
-                float_cell = float(cell)
-                temp_row_line.append(float_cell)
-            sensor_data.append(temp_row_line)
 
 
 def create_empty_res_lists(num):
@@ -77,7 +65,7 @@ def nonlin(x, deriv=False):
 
 def run_nn_on_line(line, nn, iter):
     # forward propagation:
-    input = sensor_data[line]
+    input = processed_sensor_data[line]
     layer1 = nonlin(np.dot((nn[2]), ([[input[0]], [input[1]]])))  # 2x10, 1x2
     output = nonlin(np.dot(([nn[0], nn[1]]), layer1))
     list_of_results[iter].append(output)
@@ -86,7 +74,7 @@ def run_nn_on_line(line, nn, iter):
 def run_nn_on_input_data(iter, nn):
     # nn = create_random_nums()
     line = 0
-    while line != len(sensor_data):
+    while line != len(processed_sensor_data):
         run_nn_on_line(line, nn, iter)
         line += 1
 
@@ -160,9 +148,9 @@ def breeder(nn_ranked_list):
 
 def print_res(index):  # input: page
     print("\n********** result list index is:", index, "***********\n")
-    for row in range(len(sensor_data)):
+    for row in range(len(processed_sensor_data)):
         x = str(list_of_results[index][row])
-        print("input neurons: ", sensor_data[row], '{1: >5} output: {0: >5}'.format(x.replace("\n", ''), " "))
+        print("input neurons: ", processed_sensor_data[row], '{1: >5} output: {0: >5}'.format(x.replace("\n", ''), " "))
 
 
 def tester():
@@ -175,7 +163,8 @@ def tester():
 
 def main():
     # *** INIT: *** #
-    read_lines()
+    global processed_sensor_data
+    processed_sensor_data = data_processor.read_lines(file, ' ')
     create_empty_res_lists(10)
     run_population(10)
     nextgen = breeder(rank_nns(list_of_results))
