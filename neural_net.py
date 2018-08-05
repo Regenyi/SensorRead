@@ -31,25 +31,9 @@ def create_random_nn():
 def convert_to_nn(nn_part):
     weights1 = gen_10_random_weight()  # todo: második gentől ez honnan jön?
     weights2 = gen_10_random_weight()
-    temp2d_list = []
-    for i in range(len(nn_part[0])):
-        x = np.array(nn_part[0][i]).flatten()
-        temp2d_list.append(x)
-    layer1_connecting_weights = temp2d_list  #[:10]  # todo: bug! ez most 10, közben meg 185
+    layer1_connecting_weights = nn_part[0][0]  # todo: [[[]]] 5d gonoszság bug lehetőség
     nn = [weights1, weights2, layer1_connecting_weights]
     return nn
-
-
-def gen_test_3darrays():
-    global x0, x1, z, z2
-    x0 = np.zeros((3, 3, 3))
-    x1 = np.ones((3, 3, 3))
-    x = np.zeros((3, 2))
-    y = np.zeros((2, 3))
-    z = np.array([x, y])
-    x = np.ones((3, 2))
-    y = np.ones((2, 3))
-    z2 = np.array([x, y])
 
 
 def random_choose(num1, num2):
@@ -119,35 +103,35 @@ def breed(nn1, nn2):
     return breeded
 
 
-def breeder(nn_ranked_list):
+def breeder(nn_ranked_lists):
     next_gen_nn = []
     pieces = len(list_of_results)
     for j in range(pieces):
         next_gen_nn.append([])
     for i in range(10):
-        nn_ranked_list[i] = identify_nn(nn_ranked_list[i])
+        nn_ranked_lists[i] = identify_nn(nn_ranked_lists[i])
 
     # breed 0 1 :
-    next_gen_nn[0].append(breed(nn_ranked_list[0], nn_ranked_list[1]))
+    next_gen_nn[0].append(breed(nn_ranked_lists[0], nn_ranked_lists[1]))
     # breed 0 2
-    next_gen_nn[1].append(breed(nn_ranked_list[0], nn_ranked_list[2]))
+    next_gen_nn[1].append(breed(nn_ranked_lists[0], nn_ranked_lists[2]))
     # breed 0 3
-    next_gen_nn[2].append(breed(nn_ranked_list[0], nn_ranked_list[3]))
+    next_gen_nn[2].append(breed(nn_ranked_lists[0], nn_ranked_lists[3]))
     # breed 0 4
-    next_gen_nn[3].append(breed(nn_ranked_list[0], nn_ranked_list[4]))
+    next_gen_nn[3].append(breed(nn_ranked_lists[0], nn_ranked_lists[4]))
     # breed 2 3
-    next_gen_nn[4].append(breed(nn_ranked_list[2], nn_ranked_list[3]))
+    next_gen_nn[4].append(breed(nn_ranked_lists[2], nn_ranked_lists[3]))
     # breed 2 4
-    next_gen_nn[5].append(breed(nn_ranked_list[2], nn_ranked_list[4]))
+    next_gen_nn[5].append(breed(nn_ranked_lists[2], nn_ranked_lists[4]))
     # breed 0 9
-    next_gen_nn[6].append(breed(nn_ranked_list[0], nn_ranked_list[9]))
+    next_gen_nn[6].append(breed(nn_ranked_lists[0], nn_ranked_lists[9]))
     # breed 7 9
-    next_gen_nn[7].append(breed(nn_ranked_list[7], nn_ranked_list[9]))
+    next_gen_nn[7].append(breed(nn_ranked_lists[7], nn_ranked_lists[9]))
     # breed 8 9
-    next_gen_nn[8].append(breed(nn_ranked_list[8], nn_ranked_list[9]))
+    next_gen_nn[8].append(breed(nn_ranked_lists[8], nn_ranked_lists[9]))
     # new random nn
     new_rnd_nn = create_random_nn()
-    next_gen_nn[9].append(new_rnd_nn[2])
+    next_gen_nn[9].append([new_rnd_nn[2]])
     return next_gen_nn
 
 
@@ -170,7 +154,6 @@ def main():
 
     # *** NEXT GEN LOOP STARTS FROM HERE: *** #
     # while exit_condition (0.99) not true or x = 100 loop
-    #  1 nn, első oszlopban lesz 0.99-1 neurális háló output érték
 
     x = 0
     while x < 10:
