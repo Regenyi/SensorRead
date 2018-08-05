@@ -7,18 +7,21 @@ import data_processor
 
 def create_empty_res_lists(num):
     global list_of_results
+    global list_of_nns
     list_of_results = []
+    list_of_nns = []
     for j in range(num):
         list_of_results.append([])
+        list_of_nns.append([])
 
 
-def array_randomizer():
+def gen_10_random_weight():
     return np.array([random.uniform(-1, 1) for _ in range(10)], np.float)
 
 
 def create_random_nn():
-    weights1 = array_randomizer()
-    weights2 = array_randomizer()
+    weights1 = gen_10_random_weight()
+    weights2 = gen_10_random_weight()
     random_number = random.uniform(-1, 1)
     layer1_connecting_weights = [[random_number for i in range(2)] for j in range(10)]
     nn = [weights1, weights2, layer1_connecting_weights]
@@ -26,13 +29,13 @@ def create_random_nn():
 
 
 def convert_to_nn(nn_part):
-    weights1 = array_randomizer()  # todo: második gentől ez honnan jön?
-    weights2 = array_randomizer()
+    weights1 = gen_10_random_weight()  # todo: második gentől ez honnan jön?
+    weights2 = gen_10_random_weight()
     temp2d_list = []
     for i in range(len(nn_part[0])):
         x = np.array(nn_part[0][i]).flatten()
         temp2d_list.append(x)
-    layer1_connecting_weights = temp2d_list[:10]  # todo: bug! ez most 10, közben meg 185
+    layer1_connecting_weights = temp2d_list  #[:10]  # todo: bug! ez most 10, közben meg 185
     nn = [weights1, weights2, layer1_connecting_weights]
     return nn
 
@@ -68,37 +71,43 @@ def run_nn_on_line(line, nn, iter):
 
 
 def run_nn_on_input_data(iter, nn):
-    # nn = create_random_nums()
+    if nn == 0:
+        nn = create_random_nn()
+    list_of_nns[iter].append(nn[2])  # !!!
     line = 0
     while line != len(processed_sensor_data):
         run_nn_on_line(line, nn, iter)
         line += 1
 
 
-def run_population(num, nn=create_random_nn()):
-    for i in range(num):
-        run_nn_on_input_data(i, nn)
+def run_population(num, iter=0, nn=0):
+    if iter == 0:
+        for i in range(num):
+            run_nn_on_input_data(i, nn)
+    if iter != 0:
+        for i in range(num):
+            run_nn_on_input_data(iter, nn)
 
 
-def get_biggest_num(nn, index=0):
-    nn_sorted = sorted(nn, key=lambda x: x[0], reverse=True)
-    nn_index_and_its_biggest_num = (nn_sorted[0][0], index)
+def get_biggest_num(nn_output, index=0):
+    nn_output_sorted = sorted(nn_output, key=lambda x: x[0], reverse=True)
+    nn_index_and_its_biggest_num = (nn_output_sorted[0][0], index)
     return nn_index_and_its_biggest_num
 
 
-def rank_nns(list_of_nns):
+def rank_nns(list_of_nn_outputs):
     nn_sorted_tuples = []
     pieces = len(list_of_results)
     for j in range(pieces):
         nn_sorted_tuples.append([])
     for i in range(pieces):
-        nn_sorted_tuples[i].append(get_biggest_num(list_of_nns[i], i))
+        nn_sorted_tuples[i].append(get_biggest_num(list_of_nn_outputs[i], i))
     nn_rank = sorted(nn_sorted_tuples, reverse=True)
     return nn_rank
 
 
 def identify_nn(rank_tuple):
-    return list_of_results[rank_tuple[0][1]]
+    return list_of_nns[rank_tuple[0][1]]
 
 
 def breed(nn1, nn2):
@@ -149,14 +158,6 @@ def print_res(index):  # input: page
         print("input neurons: ", processed_sensor_data[row], '{1: >5} output: {0: >5}'.format(x.replace("\n", ''), " "))
 
 
-def tester():
-    # gen_test_3darrays()
-    # breed(x0, x1)
-    # breed(z, z2)
-    # print_res(2)
-    return 0
-
-
 def main():
     # *** INIT: *** #
     global processed_sensor_data
@@ -169,18 +170,21 @@ def main():
 
     # *** NEXT GEN LOOP STARTS FROM HERE: *** #
     # while exit_condition (0.99) not true or x = 100 loop
+    #  1 nn, első oszlopban lesz 0.99-1 neurális háló output érték
 
-    nn = convert_to_nn(nextgen[0])  # todo: valójában itt a 10 db-t kell majd beadni egyesével (run population)
-    create_empty_res_lists(10)
-    run_population(10, nn)
-    print("***********")
-    print(list_of_results[1])
-    nextgen = breeder(rank_nns(list_of_results))
+    x = 0
+    while x < 10:
+        create_empty_res_lists(10)
+        for i in range(10):
+            nn = convert_to_nn(nextgen[i])
+            run_population(1, i, nn)
+        nextgen = breeder(rank_nns(list_of_results))  # todo: check loop
+        x += 1
+
+    print("**** RESULTS: *****")
+    print(nextgen[0])
 
 
 if __name__ == '__main__':
     main()
-
-
-
 
