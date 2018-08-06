@@ -1,5 +1,6 @@
 ''' thanks to @iamtrask and the stackoverflow community '''
 
+import pprint
 import numpy as np
 import random
 import data_processor
@@ -57,7 +58,7 @@ def run_nn_on_line(line, nn, iter):
 def run_nn_on_input_data(iter, nn):
     if nn == 0:
         nn = create_random_nn()
-    list_of_nns[iter].append(nn[2])  # !!!
+    list_of_nns[iter].append(nn[2])  # !!! elég-e a synapsisból ezt belerakni?
     line = 0
     while line != len(processed_sensor_data):
         run_nn_on_line(line, nn, iter)
@@ -91,7 +92,7 @@ def rank_nns(list_of_nn_outputs):
 
 
 def identify_nn(rank_tuple):
-    return list_of_nns[rank_tuple[0][1]]
+    return list_of_nns[rank_tuple[0][1]] # !!! jó outputot párositok-e jó nn-nel?
 
 
 def breed(nn1, nn2):
@@ -156,7 +157,7 @@ def main():
     # while exit_condition (0.99) not true or x = 100 loop
 
     x = 0
-    while x < 10:
+    while x < 3:
         create_empty_res_lists(10)
         for i in range(10):
             nn = convert_to_nn(nextgen[i])
@@ -165,7 +166,7 @@ def main():
         x += 1
 
     print("**** RESULTS: *****")
-    print(nextgen[0])
+    pprint.pprint(nextgen[0])
 
 
 if __name__ == '__main__':
