@@ -27,14 +27,17 @@ def create_random_nn():
     layer1_connecting_weights = [[random_number for i in range(2)] for j in range(10)]
     nn = [[weights1, weights2], layer1_connecting_weights]
     print("nnc  1", nn)
+    print("nnc lc", layer1_connecting_weights)
     return nn
 
 
-def convert_to_nn(nn_part):
+def create_new_nn(nn_part):
     weights1 = gen_10_random_weight()  # todo: második gentől ez honnan jön?
     weights2 = gen_10_random_weight()
-    layer1_connecting_weights = nn_part[0][0]  # todo: [[[]]] 5d gonoszság bug lehetőség
-    nn = [weights1, weights2, layer1_connecting_weights]
+    layer1_connecting_weights = nn_part[1]  # todo: [[[]]] 5d gonoszság bug lehetőség
+    print("nnc1 c", nn_part)
+    print("nnc00c", nn_part[1])
+    nn = [[weights1, weights2], layer1_connecting_weights]
     return nn
 
 
@@ -89,13 +92,13 @@ def rank_nns(list_of_nn_outputs):
     for j in range(pieces):
         nn_sorted_tuples.append([])
     for i in range(pieces):
-        nn_sorted_tuples[i].append(get_biggest_num(list_of_nn_outputs[i], i))
+        nn_sorted_tuples[i].append(get_biggest_num(list_of_nn_outputs[i], i))  # !!! appendeket tovább nézem!
     nn_rank = sorted(nn_sorted_tuples, reverse=True)
     return nn_rank
 
 
 def identify_nn(rank_tuple):
-    return list_of_nns[rank_tuple[0][1]] # !!! jó outputot párositok-e jó nn-nel?
+    return list_of_nns[rank_tuple[0][1]]  # !!! jó outputot párositok-e jó nn-nel?
 
 
 def breed(nn1, nn2):
@@ -119,29 +122,29 @@ def breeder(nn_ranked_lists):
 
     print("next 2", next_gen_nn[0])
     # keep 0 :
-    next_gen_nn[0].append(nn_ranked_lists[0])
+    next_gen_nn[0] = nn_ranked_lists[0]
     print("next 3", next_gen_nn[0])
     print("rank 5", nn_ranked_lists[0])
 
     # breed 0 1 :
-    next_gen_nn[1].append(breed(nn_ranked_lists[0], nn_ranked_lists[1]))
+    next_gen_nn[1] = breed(nn_ranked_lists[0], nn_ranked_lists[1])
     # breed 0 2
-    next_gen_nn[2].append(breed(nn_ranked_lists[0], nn_ranked_lists[2]))
+    next_gen_nn[2] = breed(nn_ranked_lists[0], nn_ranked_lists[2])
     # breed 0 3
-    next_gen_nn[3].append(breed(nn_ranked_lists[0], nn_ranked_lists[3]))
+    next_gen_nn[3] = breed(nn_ranked_lists[0], nn_ranked_lists[3])
     # breed 0 4
-    next_gen_nn[4].append(breed(nn_ranked_lists[0], nn_ranked_lists[4]))
+    next_gen_nn[4] = breed(nn_ranked_lists[0], nn_ranked_lists[4])
     # breed 2 3
-    next_gen_nn[5].append(breed(nn_ranked_lists[2], nn_ranked_lists[3]))
+    next_gen_nn[5] = breed(nn_ranked_lists[2], nn_ranked_lists[3])
     # breed 2 4
-    next_gen_nn[6].append(breed(nn_ranked_lists[2], nn_ranked_lists[4]))
+    next_gen_nn[6] = breed(nn_ranked_lists[2], nn_ranked_lists[4])
     # breed 0 9
-    next_gen_nn[7].append(breed(nn_ranked_lists[0], nn_ranked_lists[9]))
+    next_gen_nn[7] = breed(nn_ranked_lists[0], nn_ranked_lists[9])
     # breed 8 9
-    next_gen_nn[8].append(breed(nn_ranked_lists[8], nn_ranked_lists[9]))
+    next_gen_nn[8] = breed(nn_ranked_lists[8], nn_ranked_lists[9])
     # new random nn
     new_rnd_nn = create_random_nn()
-    next_gen_nn[9].append([new_rnd_nn[1]])
+    next_gen_nn[9] = [new_rnd_nn[1]]
     print("     3", list_of_nns[0])
     print("next 9", next_gen_nn[0])
     return next_gen_nn
@@ -170,8 +173,8 @@ def main():
     x = 0
     while x < 3:
         create_empty_res_lists(10)
-        for i in range(10):
-            nn = convert_to_nn(nextgen[i])
+        for i in range(9):
+            nn = create_new_nn(nextgen[i])
             run_population(1, i, nn)
         nextgen = breeder(rank_nns(list_of_results))  # todo: check loop
         # print(get_biggest_num(list_of_results[0]))
