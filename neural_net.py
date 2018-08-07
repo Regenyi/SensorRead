@@ -4,6 +4,9 @@ import pprint
 import numpy as np
 import random
 import data_processor
+import logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.debug('This is a log message.')
 
 
 def create_empty_res_lists(num):
@@ -26,17 +29,20 @@ def create_random_nn():
     random_number = random.uniform(-1, 1)
     layer1_connecting_weights = [[random_number for i in range(2)] for j in range(10)]
     nn = [[weights1, weights2], layer1_connecting_weights]
-    print("nnc  1", nn)
-    print("nnc lc", layer1_connecting_weights)
+    # logging.debug("nnr  1", nn)
+    # logging.debug("nnr w1", weights1)
+    # logging.debug("nnr lc", layer1_connecting_weights)
     return nn
 
 
-def create_new_nn(nn_part):
-    weights1 = gen_10_random_weight()  # todo: második gentől ez honnan jön?
-    weights2 = gen_10_random_weight()
-    layer1_connecting_weights = nn_part[1]  # todo: [[[]]] 5d gonoszság bug lehetőség
-    print("nnc1 c", nn_part)
-    print("nnc00c", nn_part[1])
+def create_new_nn(nn):
+    # logging.debug("nnc  0", nn[0])
+    # logging.debug("nnc  1", nn[1])
+    weights1 = nn[0][0]
+    weights2 = nn[0][1]
+    layer1_connecting_weights = nn[1]  # todo: [[[]]] 5d gonoszság bug lehetőség
+    # logging.debug("nnc00c", nn[0][1])
+    # logging.debug("nnc01c", nn[1])
     nn = [[weights1, weights2], layer1_connecting_weights]
     return nn
 
@@ -62,9 +68,9 @@ def run_nn_on_line(line, nn, iter):
 def run_nn_on_input_data(iter, nn):
     if nn == 0:
         nn = create_random_nn()
-    print("apnd 0", list_of_nns[0])
-    list_of_nns[iter] = nn  # !!! elég-e a synapsisból ezt belerakni?
-    print("apnd 1", list_of_nns[0])
+    # print("apnd 0", list_of_nns[0])
+    list_of_nns[iter] = nn
+    # print("apnd 1", list_of_nns[0])
     line = 0
     while line != len(processed_sensor_data):
         run_nn_on_line(line, nn, iter)
@@ -111,7 +117,7 @@ def breed(nn1, nn2):
 
 
 def breeder(nn_ranked_lists):
-    print("     2", list_of_nns[0])
+    # print("     2", list_of_nns[0])
     next_gen_nn = []
     pieces = len(list_of_results)
 
@@ -120,11 +126,11 @@ def breeder(nn_ranked_lists):
     for i in range(10):
         nn_ranked_lists[i] = identify_nn(nn_ranked_lists[i])
 
-    print("next 2", next_gen_nn[0])
+    # print("next 2", next_gen_nn[0])
     # keep 0 :
     next_gen_nn[0] = nn_ranked_lists[0]
-    print("next 3", next_gen_nn[0])
-    print("rank 5", nn_ranked_lists[0])
+    # print("next 3", next_gen_nn[0])
+    # print("rank 5", nn_ranked_lists[0])
 
     # breed 0 1 :
     next_gen_nn[1] = breed(nn_ranked_lists[0], nn_ranked_lists[1])
@@ -144,9 +150,9 @@ def breeder(nn_ranked_lists):
     next_gen_nn[8] = breed(nn_ranked_lists[8], nn_ranked_lists[9])
     # new random nn
     new_rnd_nn = create_random_nn()
-    next_gen_nn[9] = [new_rnd_nn[1]]
-    print("     3", list_of_nns[0])
-    print("next 9", next_gen_nn[0])
+    next_gen_nn[9] = new_rnd_nn
+    # print("     3", list_of_nns[0])
+    # print("next 9", next_gen_nn[0])
     return next_gen_nn
 
 
@@ -165,23 +171,28 @@ def main():
     processed_sensor_data = data_processor.read_lines(file, ' ')
     create_empty_res_lists(10)
     run_population(10)
-    print("     1", list_of_nns[0])
+    # print("     1", list_of_nns[0])
     nextgen = breeder(rank_nns(list_of_results))
+    # print("_____4", nextgen[8])
+    # print("_____5", nextgen[9])
 
     # *** NEXT GEN LOOP STARTS FROM HERE: *** #
     # while exit_condition (0.99) not true or x = 100 loop
     x = 0
-    while x < 3:
+    while x < 10:
+        # print("while loop", x)
         create_empty_res_lists(10)
-        for i in range(9):
+
+        for i in range(10):
+            # print("for loop", i)
             nn = create_new_nn(nextgen[i])
             run_population(1, i, nn)
         nextgen = breeder(rank_nns(list_of_results))  # todo: check loop
-        # print(get_biggest_num(list_of_results[0]))
+        print("bigges",get_biggest_num(list_of_results[0]))
         x += 1
 
     print("**** RESULTS: *****")
-    print("     9", nextgen[0])
+    # print("     9", nextgen[0])
     # print(list_of_results[0])
 
 
