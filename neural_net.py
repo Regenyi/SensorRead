@@ -8,40 +8,28 @@ import logging
 
 
 def create_empty_res_lists(num):
-    global list_of_results
+    global list_of_nn_outputs
     global list_of_nns
-    list_of_results = []
+    list_of_nn_outputs = []
     list_of_nns = []
     for j in range(num):
-        list_of_results.append([])
+        list_of_nn_outputs.append([])
         list_of_nns.append([])
 
 
-def gen_10_random_weight():
+def gen_random_weights():
     return np.array([random.uniform(-1, 1) for _ in range(10)], np.float)
 
 
 def create_random_nn():
-    weights1 = gen_10_random_weight()
-    weights2 = gen_10_random_weight()
+    weights1 = gen_random_weights()
+    weights2 = gen_random_weights()
     random_number = random.uniform(-1, 1)
     layer1_connecting_weights = [[random_number for i in range(2)] for j in range(10)]
     nn = [[weights1, weights2], layer1_connecting_weights]
     # logging.debug("nnr  1", nn)
-    # logging.debug("nnr w1", weights1)
+    # logging.debug("nnr w1 {}".format(weights1))
     # logging.debug("nnr lc", layer1_connecting_weights)
-    return nn
-
-
-def construct_new_nn(nn):
-    # logging.debug("nnc  0", nn[0])
-    # logging.debug("nnc  1", nn[1])
-    weights1 = nn[0][0]
-    weights2 = nn[0][1]
-    layer1_connecting_weights = nn[1]  # todo: [[[]]] 5d gonoszság bug lehetőség
-    # logging.debug("nnc00c", nn[0][1])
-    # logging.debug("nnc01c", nn[1])
-    nn = [[weights1, weights2], layer1_connecting_weights]
     return nn
 
 
@@ -60,7 +48,7 @@ def run_nn_on_line(line, nn, iter):
     input = processed_sensor_data[line]
     layer1 = nonlin(np.dot((nn[1]), ([[input[0]], [input[1]]])))  # 2x10, 1x2
     output = nonlin(np.dot(([nn[0][0], nn[0][1]]), layer1))
-    list_of_results[iter].append(output)
+    list_of_nn_outputs[iter].append(output)
 
 
 def run_nn_on_input_data(iter, nn):
@@ -85,24 +73,22 @@ def run_population(num, iter=0, nn=0):
 
 
 def get_biggest_num(nn_output, index=0):
-    nn_output_sorted = sorted(nn_output, key=lambda x: x[0], reverse=True)
-    nn_index_and_its_biggest_num = (nn_output_sorted[0][0], index)
-    return nn_index_and_its_biggest_num
+    return max(nn_output[1]), index  # which column?
 
 
 def rank_nns(list_of_nn_outputs):
     nn_sorted_tuples = []
-    pieces = len(list_of_results)
+    pieces = len(list_of_nn_outputs)
     for j in range(pieces):
         nn_sorted_tuples.append([])
     for i in range(pieces):
-        nn_sorted_tuples[i].append(get_biggest_num(list_of_nn_outputs[i], i))  # !!! appendeket tovább nézem!
+        nn_sorted_tuples[i] = get_biggest_num(list_of_nn_outputs[i], i)
     nn_rank = sorted(nn_sorted_tuples, reverse=True)
     return nn_rank
 
 
 def identify_nn(rank_tuple):
-    return list_of_nns[rank_tuple[0][1]]  # !!! jó outputot párositok-e jó nn-nel?
+    return list_of_nns[rank_tuple[1]]  # !!! jó outputot párositok-e jó nn-nel?
 
 
 def breed(nn1, nn2):
@@ -114,15 +100,17 @@ def breed(nn1, nn2):
     return breeded
 
 
-def breeder(nn_ranked_lists):
+def breeder(nn_unmacthed_ranked_lists):
     # print("     2", list_of_nns[0])
     next_gen_nn = []
-    pieces = len(list_of_results)
+    nn_ranked_lists = []
+    pieces = len(list_of_nn_outputs)
 
     for j in range(pieces):
         next_gen_nn.append([])
+        nn_ranked_lists.append([])
     for i in range(10):
-        nn_ranked_lists[i] = identify_nn(nn_ranked_lists[i])
+        nn_ranked_lists[i] = identify_nn(nn_unmacthed_ranked_lists[i])  # !!! felülirom?
 
     # print("next 2", next_gen_nn[0])
     # keep 0 :
@@ -154,16 +142,9 @@ def breeder(nn_ranked_lists):
     return next_gen_nn
 
 
-def print_res(index):  # input: page
-    print("\n********** result list index is:", index, "***********\n")
-    for row in range(len(processed_sensor_data)):
-        x = str(list_of_results[index][row])
-        print("input neurons: ", processed_sensor_data[row], '{1: >5} output: {0: >5}'.format(x.replace("\n", ''), " "))
-
-
 def main():
     # *** INIT: *** #
-    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+    logging.basicConfig(level=logging.DEBUG, format='%(message)s')
     global processed_sensor_data
     np.random.seed(1)
     file = "data/save-1.tsv"
@@ -171,7 +152,7 @@ def main():
     create_empty_res_lists(10)
     run_population(10)
     # print("     1", list_of_nns[0])
-    nextgen = breeder(rank_nns(list_of_results))
+    nextgen = breeder(rank_nns(list_of_nn_outputs))
     # print("_____4", nextgen[8])
     # print("_____5", nextgen[9])
 
@@ -184,15 +165,15 @@ def main():
 
         for i in range(10):
             # print("for loop", i)
-            nn = construct_new_nn(nextgen[i])  # compare nextgen[i] and nn
+            nn = nextgen[i]
             run_population(1, i, nn)
-        nextgen = breeder(rank_nns(list_of_results))  # todo: check loop
-        print("bigest", get_biggest_num(list_of_results[0]))
+        nextgen = breeder(rank_nns(list_of_nn_outputs))  # todo: check loop
+        print("bigest", get_biggest_num(list_of_nn_outputs[0]))
         x += 1
 
     print("**** RESULTS: *****")
     # print("     9", nextgen[0])
-    # print(list_of_results[0])
+    # print(list_of_nn_outputs[0])
 
 
 if __name__ == '__main__':
