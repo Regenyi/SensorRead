@@ -5,8 +5,6 @@ import numpy as np
 import random
 import data_processor
 import logging
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
-logging.debug('This is a log message.')
 
 
 def create_empty_res_lists(num):
@@ -35,7 +33,7 @@ def create_random_nn():
     return nn
 
 
-def create_new_nn(nn):
+def construct_new_nn(nn):
     # logging.debug("nnc  0", nn[0])
     # logging.debug("nnc  1", nn[1])
     weights1 = nn[0][0]
@@ -165,6 +163,7 @@ def print_res(index):  # input: page
 
 def main():
     # *** INIT: *** #
+    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
     global processed_sensor_data
     np.random.seed(1)
     file = "data/save-1.tsv"
@@ -185,10 +184,10 @@ def main():
 
         for i in range(10):
             # print("for loop", i)
-            nn = create_new_nn(nextgen[i])
+            nn = construct_new_nn(nextgen[i])  # compare nextgen[i] and nn
             run_population(1, i, nn)
         nextgen = breeder(rank_nns(list_of_results))  # todo: check loop
-        print("bigges",get_biggest_num(list_of_results[0]))
+        print("bigest", get_biggest_num(list_of_results[0]))
         x += 1
 
     print("**** RESULTS: *****")
