@@ -28,7 +28,7 @@ def create_random_nn():
     layer1_connecting_weights = [[random_number for i in range(2)] for j in range(10)]
     nn = [[weights1, weights2], layer1_connecting_weights]
     # logging.debug("nnr  1", nn)
-    # logging.debug("nnr w1 {}".format(weights1))
+    logging.debug("nnr w1 {}".format(weights1))
     # logging.debug("nnr lc", layer1_connecting_weights)
     return nn
 
@@ -72,23 +72,23 @@ def run_population(num, iter=0, nn=0):
             run_nn_on_input_data(iter, nn)
 
 
-def get_biggest_num(nn_output, index=0):
-    return max(nn_output[1]), index  # which column?
+def get_biggest_num(nn_output):
+    return np.amax(nn_output)
 
 
-def rank_nns(list_of_nn_outputs):
-    nn_sorted_tuples = []
+def rank_nns(lst_of_nn_outputs):
+    biggest_num_unsorted_tuples = []
     pieces = len(list_of_nn_outputs)
     for j in range(pieces):
-        nn_sorted_tuples.append([])
+        biggest_num_unsorted_tuples.append([])
     for i in range(pieces):
-        nn_sorted_tuples[i] = get_biggest_num(list_of_nn_outputs[i], i)
-    nn_rank = sorted(nn_sorted_tuples, reverse=True)
-    return nn_rank
+        biggest_num_unsorted_tuples[i] = get_biggest_num(list_of_nn_outputs[i]), i
+    biggest_num_and_source_nn_index = sorted(biggest_num_unsorted_tuples, reverse=True)  # pl: ((num1, 3) , (num2, 6))
+    return biggest_num_and_source_nn_index
 
 
-def identify_nn(rank_tuple):
-    return list_of_nns[rank_tuple[1]]  # !!! jó outputot párositok-e jó nn-nel?
+def identify_nn(biggest_num_and_source_nn_index):
+    return list_of_nns[biggest_num_and_source_nn_index[1]]  # !!! jó outputot párositok-e jó nn-nel? úgy tűnik mintha jót
 
 
 def breed(nn1, nn2):
@@ -100,21 +100,31 @@ def breed(nn1, nn2):
     return breeded
 
 
-def breeder(nn_unmacthed_ranked_lists):
+def breeder(biggest_num_and_source_nn_index_list):
     # print("     2", list_of_nns[0])
     next_gen_nn = []
     nn_ranked_lists = []
     pieces = len(list_of_nn_outputs)
+    # print("1 lst_nns", list_of_nns)
 
     for j in range(pieces):
         next_gen_nn.append([])
         nn_ranked_lists.append([])
     for i in range(10):
-        nn_ranked_lists[i] = identify_nn(nn_unmacthed_ranked_lists[i])  # !!! felülirom?
+        # print("bigest 0", biggest_num_and_source_nn_index_list[i])
+        nn_ranked_lists[i] = identify_nn(biggest_num_and_source_nn_index_list[i])  # !!! felülirom? jónak tűnik
+
+        # print("ranked_list", nn_ranked_lists[i])
+        # print("biggest_nu2", biggest_num_and_source_nn_index_list[i])
+        # x = biggest_num_and_source_nn_index_list[i][1]
+        # print("list_of_nns", list_of_nns[x])
+        # print("nns results", list_of_nn_outputs[x])
 
     # print("next 2", next_gen_nn[0])
     # keep 0 :
     next_gen_nn[0] = nn_ranked_lists[0]
+    print("2 rank_lst", next_gen_nn[0])
+    # print("3 nextgen0", next_gen_nn[0])
     # print("next 3", next_gen_nn[0])
     # print("rank 5", nn_ranked_lists[0])
 
@@ -144,7 +154,7 @@ def breeder(nn_unmacthed_ranked_lists):
 
 def main():
     # *** INIT: *** #
-    logging.basicConfig(level=logging.DEBUG, format='%(message)s')
+    # logging.basicConfig(level=logging.DEBUG, format='%(message)s')
     global processed_sensor_data
     np.random.seed(1)
     file = "data/save-1.tsv"
@@ -152,14 +162,17 @@ def main():
     create_empty_res_lists(10)
     run_population(10)
     # print("     1", list_of_nns[0])
-    nextgen = breeder(rank_nns(list_of_nn_outputs))
+    biggest_num_and_source_nn_index_list = rank_nns(list_of_nn_outputs)
+    nextgen = breeder(biggest_num_and_source_nn_index_list)
+    print("5 rank_lst", nextgen[0])
+    # print("bigest 1", get_biggest_num(list_of_nn_outputs))
     # print("_____4", nextgen[8])
     # print("_____5", nextgen[9])
 
     # *** NEXT GEN LOOP STARTS FROM HERE: *** #
     # while exit_condition (0.99) not true or x = 100 loop
     x = 0
-    while x < 10:
+    while x < 2:
         # print("while loop", x)
         create_empty_res_lists(10)
 
@@ -167,8 +180,11 @@ def main():
             # print("for loop", i)
             nn = nextgen[i]
             run_population(1, i, nn)
-        nextgen = breeder(rank_nns(list_of_nn_outputs))  # todo: check loop
-        print("bigest", get_biggest_num(list_of_nn_outputs[0]))
+
+        # print("4 lst_nns", list_of_nns)
+        nextgen = breeder(rank_nns(list_of_nn_outputs))  # todo: check loop, seems ok
+        # print("5 nextgen", nextgen[0])
+        # print("bigest n", get_biggest_num(list_of_nn_outputs))
         x += 1
 
     print("**** RESULTS: *****")
