@@ -21,11 +21,15 @@ def create_empty_res_lists(num):
     list_of_nns = [[] for i in range(num)]
 
 
+# [2, 10, 2]
+# [22, 10, 22]
+# [22, 10, 10, 22]
+
 def gen_random_weights():
     return np.array([random.uniform(-1, 1) for _ in range(10)], np.float)
 
 
-def create_random_nn():
+def create_random_nn(shape):
     weights1 = gen_random_weights()
     weights2 = gen_random_weights()
     random_number = random.uniform(-1, 1)
@@ -44,11 +48,9 @@ def nonlin(x, deriv=False):
 
 
 # forward propagation:
-def run_nn_on_line(line, nn, iter):
-    input = processed_sensor_data[line]
+def run_nn_on_line(input, nn):
     layer1 = nonlin(np.dot((nn[1]), ([[input[0]], [input[1]]])))  # 2x10, 1x2
-    output = nonlin(np.dot(([nn[0][0], nn[0][1]]), layer1))
-    list_of_nn_outputs[iter].append(output)
+    return nonlin(np.dot(([nn[0][0], nn[0][1]]), layer1))
 
 
 def run_nn_on_input_data(iter, nn):
@@ -56,8 +58,11 @@ def run_nn_on_input_data(iter, nn):
         nn = create_random_nn()
     list_of_nns[iter] = nn
     line = 0
+    last_out = [0] * 22
     while line != len(processed_sensor_data):
-        run_nn_on_line(line, nn, iter)
+        next_out = run_nn_on_line((processed_sensor_data[line] + last_out[2:]), nn)
+        last_out = next_out
+        list_of_nn_outputs[iter].append(last_out)
         line += 1
 
 
@@ -129,9 +134,27 @@ def breeder(biggest_num_and_source_nn_index_list):
     return next_gen_nn
 
 
+def should_be(a, b):
+    if a != b:
+        raise Exception('Error!')
+
+
+def spec():
+    should_be(create_random_nn([2, 2, 2]).length, 3)
+    should_be(create_random_nn([2, 2, 2])[0].length, 2)
+    should_be(create_random_nn([2, 3, 2])[1].length, 3)
+    should_be(create_random_nn([2, 4, 4, 2])[0][0].length, 2)
+    should_be(create_random_nn([2, 4, 4, 2])[0][1].length, 4)
+    should_be(create_random_nn([2, 4, 4, 2])[1][0].length, 4)
+    should_be(create_random_nn([2, 4, 4, 2])[1][1].length, 4)
+    should_be(create_random_nn([2, 4, 4, 2])[2][0].length, 4)
+    should_be(create_random_nn([2, 4, 4, 2])[2][1].length, 2)
+    should_be(create_random_nn([2, 2, 6, 2]).length, 4)
+
+
 def main():
     # *** INIT: *** #
-
+    spec()
     logging.basicConfig(filename='log.txt', level=logging.DEBUG, format='%(message)s', filemode="w")
     # logging.basicConfig(level=logging.DEBUG, format='%(message)s')
     global processed_sensor_data
