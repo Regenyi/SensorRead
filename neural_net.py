@@ -33,7 +33,7 @@ def create_random_nn(shape):
     weights1 = gen_random_weights()
     weights2 = gen_random_weights()
     random_number = random.uniform(-1, 1)
-    layer1_connecting_weights = np.array([[random_number for i in range(2)] for j in range(10)], np.float)
+    layer1_connecting_weights = np.array([[random_number for i in range(shape[1])] for j in range(10)], np.float)
     nn = [[weights1, weights2], layer1_connecting_weights]
     # logging.debug("nnr  1 {}".format(nn))
     # logging.debug("nnr w1 {}".format(weights1))
@@ -135,12 +135,13 @@ def breeder(biggest_num_and_source_nn_index_list):
 
 
 def should_be(a, b):
-    if a != b:
+    print(len(a), b)
+    if len(a) != b:
         raise Exception('Error!')
 
 
-def spec():
-    should_be(create_random_nn([2, 2, 2]).length, 3)
+def test():
+    should_be(create_random_nn([2, 2, 2]), 3)
     should_be(create_random_nn([2, 2, 2])[0].length, 2)
     should_be(create_random_nn([2, 3, 2])[1].length, 3)
     should_be(create_random_nn([2, 4, 4, 2])[0][0].length, 2)
@@ -154,7 +155,7 @@ def spec():
 
 def main():
     # *** INIT: *** #
-    spec()
+    test()
     logging.basicConfig(filename='log.txt', level=logging.DEBUG, format='%(message)s', filemode="w")
     # logging.basicConfig(level=logging.DEBUG, format='%(message)s')
     global processed_sensor_data
