@@ -1,10 +1,8 @@
 """ thanks to @iamtrask and the stackoverflow community """
 
 #  todo: add more data + new fitness function (based on avarage)
-#  todo: add memory (önmagára vissza + 20)
 '''Be able to differentiate between circle and triangle
 Make neural network take cyclical input: use cycle neurons as it reads line by line from the csv
-Add 20 cycle neurons
 Train on more than one file's dataset'''
 
 import numpy as np
@@ -21,7 +19,6 @@ def create_empty_res_lists(num):
     list_of_nns = [[] for i in range(num)]
 
 
-# [2, 10, 2]
 # [22, 10, 22]
 # [22, 10, 10, 22]
 
@@ -30,11 +27,13 @@ def gen_random_weights():
 
 
 def create_random_nn(shape):
-    weights1 = gen_random_weights()
-    weights2 = gen_random_weights()
+    # weights1 = gen_random_weights()
+    # weights2 = gen_random_weights()
     random_number = random.uniform(-1, 1)
-    layer1_connecting_weights = np.array([[random_number for i in range(shape[1])] for j in range(10)], np.float)
-    nn = [[weights1, weights2], layer1_connecting_weights]
+    nn = []
+    for k in range(len(shape) - 1):
+        nn.append(np.array([[random_number for i in range(shape[k+1])] for j in range(shape[k+0])], np.float))
+    # nn = [[weights1, weights2], layer1_connecting_weights]
     # logging.debug("nnr  1 {}".format(nn))
     # logging.debug("nnr w1 {}".format(weights1))
     # logging.debug("nnr lc {}".format(layer1_connecting_weights))
@@ -135,22 +134,26 @@ def breeder(biggest_num_and_source_nn_index_list):
 
 
 def should_be(a, b):
-    print(len(a), b)
-    if len(a) != b:
-        raise Exception('Error!')
+    if a != b:
+        raise Exception('Error!', a, b)
 
 
 def test():
-    should_be(create_random_nn([2, 2, 2]), 3)
-    should_be(create_random_nn([2, 2, 2])[0].length, 2)
-    should_be(create_random_nn([2, 3, 2])[1].length, 3)
-    should_be(create_random_nn([2, 4, 4, 2])[0][0].length, 2)
-    should_be(create_random_nn([2, 4, 4, 2])[0][1].length, 4)
-    should_be(create_random_nn([2, 4, 4, 2])[1][0].length, 4)
-    should_be(create_random_nn([2, 4, 4, 2])[1][1].length, 4)
-    should_be(create_random_nn([2, 4, 4, 2])[2][0].length, 4)
-    should_be(create_random_nn([2, 4, 4, 2])[2][1].length, 2)
-    should_be(create_random_nn([2, 2, 6, 2]).length, 4)
+    should_be(len(create_random_nn([2, 2, 2])      ), 2)
+    should_be(len(create_random_nn([2, 3, 2])[0]   ), 2)
+    should_be(len(create_random_nn([2, 3, 2])[0][0]), 3)
+    should_be(len(create_random_nn([2, 3, 2])[1]   ), 3)
+    should_be(len(create_random_nn([2, 3, 2])[1][0]), 2)
+    # should_be(len(create_random_nn([2, 3, 2])[2]), 3)
+
+    should_be(len(create_random_nn([2, 4, 4, 2])      ), 3)
+    should_be(len(create_random_nn([2, 4, 4, 2])[0]   ), 2)
+    should_be(len(create_random_nn([2, 4, 4, 2])[0][0]), 4)
+    should_be(len(create_random_nn([2, 4, 4, 2])[1]   ), 4)
+    should_be(len(create_random_nn([2, 4, 4, 2])[1][0]), 4)
+    should_be(len(create_random_nn([2, 4, 4, 2])[2]   ), 4)
+    should_be(len(create_random_nn([2, 4, 4, 2])[2][0]), 2)
+    # should_be(len(create_random_nn([2, 2, 6, 2])), 4)
 
 
 def main():
@@ -169,6 +172,8 @@ def main():
 
     # *** NEXT GEN LOOP STARTS FROM HERE: *** #
 
+
+    # for file in files:
     exit_condition = 0
     iteration = 0
     while exit_condition < 0.997 and iteration < 1000:
